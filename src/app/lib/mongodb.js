@@ -1,7 +1,6 @@
 import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
-// const uri = "mongodb+srv://roy:EdgeArk1@cluster0.xgke8hd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const options = {};
 
 let client;
