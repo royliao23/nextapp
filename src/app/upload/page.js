@@ -47,7 +47,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
+    <div className="container min-h-screen mx-auto p-4 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Upload Fixtures CSV</h1>
       
       <form onSubmit={handleSubmit} className="space-y-4">
