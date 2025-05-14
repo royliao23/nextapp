@@ -74,7 +74,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
-          © {new Date().getFullYear()} FixturesApp. All rights reserved.
+          © {new Date().getFullYear()} FixturesApp. All rights reserved..
         </div>
       </div>
     </footer>
