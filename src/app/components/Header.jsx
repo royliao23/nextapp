@@ -1,12 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+// import { signOut, useSession } from 'next-auth/react';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  // const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -18,11 +26,20 @@ export default function Header() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push('/login');
+  };
+
+  const isLoginPage = pathname === '/login';
+
+  if (!isMounted) return null;
+
   return (
     <header className="bg-blue-600 text-white shadow-md">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          {/* Logo */}
+          {/* Logo - Always shown */}
           <Link href="/" className="flex items-center space-x-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -47,48 +64,76 @@ export default function Header() {
             <span className="text-xl font-bold">FixturesApp</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? 'bg-blue-700'
-                    : 'hover:bg-blue-500'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          {/* Desktop Navigation - Hidden on login page */}
+          {!isLoginPage && (
+            <nav className="hidden md:flex items-center space-x-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === link.href
+                      ? 'bg-blue-700'
+                      : 'hover:bg-blue-500'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+              
+              {/* Auth Links */}
+              {status === 'authenticated' ? (
+                <>
+                  <span className="text-sm">Welcome</span>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-500"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    pathname === '/login'
+                      ? 'bg-blue-700'
+                      : 'hover:bg-blue-500'
+                  }`}
+                >
+                  Login
+                </Link>
+              )}
+            </nav>
+          )}
 
-          {/* Mobile Menu Button */}
-          <button 
-            onClick={toggleMenu}
-            className="md:hidden p-2 rounded-md hover:bg-blue-500 focus:outline-none"
-            aria-label="Toggle menu"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          {/* Mobile Menu Button - Hidden on login page */}
+          {!isLoginPage && (
+            <button 
+              onClick={toggleMenu}
+              className="md:hidden p-2 rounded-md hover:bg-blue-500 focus:outline-none"
+              aria-label="Toggle menu"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+                />
+              </svg>
+            </button>
+          )}
         </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
+        {/* Mobile Menu - Hidden on login page */}
+        {!isLoginPage && isMenuOpen && (
           <div className="md:hidden mt-2 pb-3 space-y-2 transition-all">
             {navLinks.map((link) => (
               <Link
@@ -104,6 +149,36 @@ export default function Header() {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Mobile Auth Links */}
+            {status === 'authenticated' ? (
+              <>
+                <div className="block px-3 py-2 text-base font-medium">
+                  Welcome, {session.user.name}
+                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-500"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  pathname === '/login'
+                    ? 'bg-blue-700 text-white'
+                    : 'text-white hover:bg-blue-500'
+                }`}
+              >
+                Login
+              </Link>
+            )}
           </div>
         )}
       </div>
