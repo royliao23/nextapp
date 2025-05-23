@@ -3,7 +3,7 @@
 // import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+const uri = process.env.BACKEND_URL || 'http://localhost:4000';
 export default function LoginPage() {
   const [username, setUsername] = useState('');
 
@@ -13,13 +13,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // const result = await signIn('credentials', {
-    //   redirect: false,
-    //   username,
-    //   password,
-    // });
+  
     try {
-    const result = await fetch('http://localhost:4000/auth/login', {
+    const result = await fetch(`${uri}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

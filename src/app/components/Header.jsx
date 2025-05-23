@@ -8,13 +8,20 @@ import { usePathname, useRouter } from 'next/navigation';
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  // const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    const token = localStorage.getItem('authToken');
+    const username = localStorage.getItem('username');
+    if (token && username) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [isLoggedIn]);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -27,7 +34,8 @@ export default function Header() {
   };
 
   const handleLogout = async () => {
-    await signOut({ redirect: false });
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
     router.push('/login');
   };
 
@@ -82,9 +90,8 @@ export default function Header() {
               ))}
               
               {/* Auth Links */}
-              {status === 'authenticated' ? (
+              {isLoggedIn ? (
                 <>
-                  <span className="text-sm">Welcome</span>
                   <button
                     onClick={handleLogout}
                     className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-500"
@@ -151,7 +158,7 @@ export default function Header() {
             ))}
             
             {/* Mobile Auth Links */}
-            {status === 'authenticated' ? (
+            {isLoggedIn ? (
               <>
                 <div className="block px-3 py-2 text-base font-medium">
                   Welcome, {session.user.name}
