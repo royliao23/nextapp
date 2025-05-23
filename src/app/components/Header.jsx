@@ -11,17 +11,31 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    setIsMounted(true);
-    const token = localStorage.getItem('authToken');
-    const username = localStorage.getItem('username');
-    if (token && username) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [isLoggedIn]);
+  setIsMounted(true);
+  }, []);
+  useEffect(() => {
+  const handleAuthChange = () => {
+    const storedUsername = localStorage.getItem('username');
+    const storedToken = localStorage.getItem('authToken');
+
+    setUsername(storedUsername);
+    setToken(storedToken);
+    setIsLoggedIn(!!(storedToken && storedUsername));
+  };
+
+  window.addEventListener('authChanged', handleAuthChange);
+
+  // Initial check
+  handleAuthChange();
+
+  return () => {
+    window.removeEventListener('authChanged', handleAuthChange);
+  };
+}, []);
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -73,7 +87,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation - Hidden on login page */}
-          {!isLoginPage && (
+          {!isLoginPage && isLoggedIn && (
             <nav className="hidden md:flex items-center space-x-6">
               {navLinks.map((link) => (
                 <Link
@@ -92,12 +106,16 @@ export default function Header() {
               {/* Auth Links */}
               {isLoggedIn ? (
                 <>
+                  
                   <button
                     onClick={handleLogout}
                     className="px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-500"
                   >
-                    Logout
+                    Logout 
                   </button>
+                  <span className="text-sm font-medium">
+                     {username}
+                  </span>
                 </>
               ) : (
                 <Link
@@ -160,9 +178,7 @@ export default function Header() {
             {/* Mobile Auth Links */}
             {isLoggedIn ? (
               <>
-                <div className="block px-3 py-2 text-base font-medium">
-                  Welcome, {session.user.name}
-                </div>
+                
                 <button
                   onClick={() => {
                     handleLogout();
@@ -172,6 +188,9 @@ export default function Header() {
                 >
                   Logout
                 </button>
+                <span className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-500">
+                     {username}
+                </span>
               </>
             ) : (
               <Link

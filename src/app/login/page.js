@@ -31,8 +31,9 @@ export default function LoginPage() {
       localStorage.setItem('authToken', data.token);
       localStorage.setItem('username', username);
       alert('Login successful!');
-    
+      window.dispatchEvent(new Event("authChanged"));
       router.push('/');
+     
     }
     else {
       alert('Login failed. Please check your credentials.');
