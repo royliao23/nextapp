@@ -46,6 +46,14 @@ export default function UploadPage() {
     }
   };
 
+  if (!(localStorage.getItem('authToken') && localStorage.getItem('username'))) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600 text-lg">
+        This Page is for Members Only, You are Logged in.
+      </div>
+    );
+  }
+
   return (
     <div className="container min-h-screen mx-auto p-4 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Upload Fixtures CSV</h1>

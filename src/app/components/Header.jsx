@@ -50,6 +50,8 @@ export default function Header() {
   const handleLogout = async () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
+    setIsLoggedIn(false);
+    setUsername("");
     router.push('/login');
   };
 
@@ -87,7 +89,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation - Hidden on login page */}
-          {!isLoginPage && isLoggedIn && (
+          {!isLoginPage  && (
             <nav className="hidden md:flex items-center space-x-6">
               {navLinks.map((link) => (
                 <Link
@@ -126,14 +128,14 @@ export default function Header() {
                       : 'hover:bg-blue-500'
                   }`}
                 >
-                  Login
+                  My Account
                 </Link>
               )}
             </nav>
           )}
 
           {/* Mobile Menu Button - Hidden on login page */}
-          {!isLoginPage && (
+          {!isLoginPage  && (
             <button 
               onClick={toggleMenu}
               className="md:hidden p-2 rounded-md hover:bg-blue-500 focus:outline-none"
