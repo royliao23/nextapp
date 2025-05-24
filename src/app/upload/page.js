@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function UploadPage() {
@@ -8,7 +8,15 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [uploadResult, setUploadResult] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(null); // null = loading, false = not logged in, true = logged in
+
   const router = useRouter();
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const username = localStorage.getItem('username');
+    setLoggedIn(!!(authToken && username));
+  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -32,7 +40,7 @@ export default function UploadPage() {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(result.error || 'Upload failed');
       }
@@ -46,10 +54,14 @@ export default function UploadPage() {
     }
   };
 
-  if (!(localStorage.getItem('authToken') && localStorage.getItem('username'))) {
+  if (loggedIn === null) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!loggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600 text-lg">
-        This Page is for Members Only, You are Logged in.
+        This page is for members only. You are not logged in.
       </div>
     );
   }
@@ -57,7 +69,7 @@ export default function UploadPage() {
   return (
     <div className="container min-h-screen mx-auto p-4 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Upload Fixtures CSV</h1>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-2 font-medium">
@@ -76,7 +88,7 @@ export default function UploadPage() {
               hover:file:bg-blue-100"
           />
         </div>
-        
+
         <button
           type="submit"
           disabled={isUploading}
@@ -87,9 +99,13 @@ export default function UploadPage() {
       </form>
 
       {message && (
-        <div className={`mt-4 p-4 rounded-md ${
-          message.includes('Success') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-        }`}>
+        <div
+          className={`mt-4 p-4 rounded-md ${
+            message.includes('Success')
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
           {message}
         </div>
       )}
@@ -98,7 +114,7 @@ export default function UploadPage() {
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Upload Summary</h2>
           <p>Fixtures inserted: {uploadResult.Count}</p>
-          
+
           <h3 className="font-medium mt-4 mb-2">Sample Data:</h3>
           <pre className="bg-gray-100 p-3 rounded-md text-sm overflow-x-auto">
             {JSON.stringify(uploadResult.fixtures, null, 2)}
