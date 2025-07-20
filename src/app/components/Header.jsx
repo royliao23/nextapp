@@ -24,7 +24,7 @@ export default function Header() {
 
     setUsername(storedUsername);
     setToken(storedToken);
-    setIsLoggedIn(!!(storedToken && storedUsername));
+    setIsLoggedIn(storedToken && storedUsername);
   };
 
   window.addEventListener('authChanged', handleAuthChange);
@@ -40,6 +40,7 @@ export default function Header() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Upload', href: '/upload' },
+    { name: 'Company', href: '/company' },
     { name: 'Search', href: '/search' },
   ];
 
@@ -50,6 +51,9 @@ export default function Header() {
   const handleLogout = async () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('id');
     setIsLoggedIn(false);
     setUsername("");
     router.push('/login');
@@ -128,7 +132,7 @@ export default function Header() {
                       : 'hover:bg-blue-500'
                   }`}
                 >
-                  My Account
+                  Login
                 </Link>
               )}
             </nav>

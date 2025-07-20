@@ -1,5 +1,5 @@
 // lib/api.js
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0dXNlcjgiLCJleHAiOjE3NTMwMTgwMjR9.H3x8yrNIEZy3RmV_dXzoxPJ85oT5Jb_fl2t6ElqSIS4";
+const token = localStorage.getItem('authToken');
 if (!token) {
   throw new Error('No auth token found');
 }
